@@ -5,6 +5,10 @@
 // - error catching for quote API
 // - make fonts more readable
 // - publish to chrome web store!
+// - only show short quotes (or make font smaller for long ones)
+// - cache quotes or have a json file with all quotes downloaded
+// - ability to choose which stoic author
+//    -> saves the author in local storage
 
 const date = new Date();
 document.getElementById("time").textContent = date.toLocaleTimeString("en-us", {

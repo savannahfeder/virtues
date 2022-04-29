@@ -1,12 +1,12 @@
 {
-    "manifest_version": 3,
-    "name": "Personal Dashboard",
-    "version": "1.0.0",
-    "description": "Just for practicing async JS",
-    "action": {
-        "default_icon": "icon.png"
-    },
-    "chrome_url_overrides": {
-        "newtab": "index.html"
-    }
+  "manifest_version": 3,
+  "name": "Virtues",
+  "version": "1.0.0",
+  "description": "Replace your new tab window with a daily quote from Marcus Aurelius",
+  "action": {
+    "default_icon": "icon.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  }
 }
