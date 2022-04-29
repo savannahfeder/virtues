@@ -27,9 +27,17 @@ div.top {
   justify-content: space-between;
 }
 
-h1.time {
+#quote {
   text-align: center;
-  font-size: 5rem;
+  font-size: 1.6rem;
+  text-shadow: 2px 2px 10px #202020;
+  width: 50%;
+  margin: auto;
+}
+
+#time {
+  text-align: center;
+  font-size: 3rem;
 }
 
 div#crypto {

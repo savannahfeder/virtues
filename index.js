@@ -13,13 +13,13 @@ fetch(
     document.getElementById("author").textContent = `By: Dodi Achmad`;
   });
 
-function getCurrentTime() {
+const getCurrentTime = () => {
   const date = new Date();
   document.getElementById("time").textContent = date.toLocaleTimeString(
     "en-us",
     { timeStyle: "short" }
   );
-}
+};
 
 setInterval(getCurrentTime, 1000);
 
@@ -43,3 +43,19 @@ navigator.geolocation.getCurrentPosition((position) => {
     })
     .catch((err) => console.error(err));
 });
+
+fetch("https://stoic-server.herokuapp.com/search/marcus")
+  .then((res) => res.json())
+  .then((data) => {
+    console.log(data.length);
+    const index = getRandomNumber();
+    const currentQuote = data[index];
+    console.log(currentQuote.body);
+    console.log(currentQuote.author);
+    document.getElementById("quote").textContent = `"${currentQuote.body}"`;
+  });
+
+// returns number between 0 and 515 (516 total MA quotes)
+const getRandomNumber = () => {
+  return Math.round(Math.random() * 515);
+};
