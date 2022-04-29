@@ -1,16 +1,5 @@
-# title(){return this.options.title||this.options.name}
+# Virtues
+Virtues is a chrome extension that replaces Google's new tab page with a photo of a landscape and a daily quote by Marcus Aurelius – the famous Roman emperor and Stoic philosopher.
 
-## Supporting Scrimba
 
-Since 2017, we have created over 20 free courses on Scrimba, and we're going to
-continue launching free courses. But to pay our bills, we have to charge once
-in a while. So if you've ever wanted to "give back" to Scrimba, you can do that by buying
-	one of our paid courses
-
-- [Become a professional React developer](https://scrimba.com/course/greact)
-- [The Responsive Web Design Bootcamp](https://scrimba.com/course/gresponsive)
-- [The Ultimate JavaScript Bootcamp](https://scrimba.com/course/gjavascript)
-
-	It would also mean the world to us if you share the courses.  
-
-Happy Coding!
+<img width="1430" alt="image" src="https://user-images.githubusercontent.com/71240740/165875753-a90c8d65-e3e1-4faf-afbd-b7eff4d65f21.png">
