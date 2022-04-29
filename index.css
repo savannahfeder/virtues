@@ -19,7 +19,6 @@ main {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 div.top {
@@ -32,12 +31,25 @@ div.top {
   font-size: 1.6rem;
   text-shadow: 2px 2px 10px #202020;
   width: 50%;
-  margin: auto;
+  margin: 0 auto;
+}
+
+#author {
+  text-align: center;
+  font-size: 1.6rem;
+  text-shadow: 2px 2px 10px #202020;
+  width: 50%;
+  margin: 3 auto;
 }
 
 #time {
   text-align: center;
-  font-size: 3rem;
+  font-size: 5rem;
+  margin: 5px;
+}
+
+.center {
+  margin-top: 14%;
 }
 
 div#crypto {
@@ -62,9 +74,10 @@ div#weather {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-self: flex-start;
-  margin-top: -20px;
+  margin-top: -7px;
+  margin-left: 15px;
 }
 
 div#weather > img {
@@ -73,7 +86,7 @@ div#weather > img {
 
 p.weather-city {
   width: 100%;
-  text-align: right;
+  text-align: left;
   margin: 0;
   margin-top: -10px;
   font-size: 1.2rem;
@@ -85,6 +98,6 @@ p.weather-temp {
   margin-left: -10px;
 }
 
-p#author {
+p#photographer {
   font-size: 1rem;
 }
