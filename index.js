@@ -6,7 +6,6 @@
 // - publish to chrome web store!
 // --------
 // - button to generate new quote and image (small 🔁 button in corner?)
-// - only show short quotes (or make font smaller for long ones)
 // - cache quotes or have a json file with all quotes downloaded
 // - ability to choose which stoic author
 //    -> saves the author in local storage
@@ -47,11 +46,19 @@ setInterval(getCurrentTime, 1000);
 // returns number between 0 and 515 (516 total MA quotes)
 const getRandomIndex = () => Math.round(Math.random() * 515);
 
+const checkIfQuoteTooLong = (quote) => {
+  const maxQuoteChars = 155;
+  const quoteLength = quote.body.length;
+  return quoteLength > maxQuoteChars;
+};
+
 fetch('https://stoic-server.herokuapp.com/search/marcus')
   .then((res) => res.json())
   .then((data) => {
-    const index = getRandomIndex();
-    const currentQuote = data[index];
-    document.getElementById('quote').textContent = `"${currentQuote.body}"`;
-    document.getElementById('author').textContent = currentQuote.author;
+    let currentQuoteData = data[getRandomIndex()];
+    while (checkIfQuoteTooLong(currentQuoteData)) {
+      currentQuoteData = data[getRandomIndex()];
+    }
+    document.getElementById('quote').textContent = `"${currentQuoteData.body}"`;
+    document.getElementById('author').textContent = currentQuoteData.author;
   });
