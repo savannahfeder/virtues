@@ -1,7 +1,4 @@
 // NEXT STEPS
-// - fix Lint so that - in this project only - it changes quotes to single quotes
-// - make gitignore file
-// -----------
 // - refactor from fetch to use async await
 // - make quotes render once every day
 // - error catching for quote API
@@ -30,6 +27,7 @@ fetch(
     ).textContent = `Photo by ${data.user.name}`;
   })
   .catch((err) => {
+    console.log(err);
     document.body.style.backgroundImage = `url(
       https://images.unsplash.com/photo-1560008511-11c63416e52d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyMTEwMjl8MHwxfHJhbmRvbXx8fHx8fHx8fDE2MjI4NDIxMTc&ixlib=rb-1.2.1&q=80&w=1080
     )`;
