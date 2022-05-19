@@ -1,0 +1,24 @@
+{
+  "name": "virtues",
+  "version": "1.0.0",
+  "description": "Virtues is a chrome extension that replaces Google's new tab page with a photo of a landscape and a daily quote by Marcus Aurelius – the famous Roman emperor and Stoic philosopher.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/savannahfeder/virtues.git"
+  },
+  "author": "Savannah Feder",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/savannahfeder/virtues/issues"
+  },
+  "homepage": "https://github.com/savannahfeder/virtues#readme",
+  "devDependencies": {
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  }
+}
