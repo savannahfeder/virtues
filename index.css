@@ -11,7 +11,6 @@ body {
   background-size: cover;
   color: white;
   font-family: Arial, Helvetica, sans-serif;
-  text-shadow: 0px 0px 20px #242424;
 }
 
 main {
@@ -29,9 +28,9 @@ div.top {
 #quote {
   text-align: center;
   font-size: 1.6rem;
-  text-shadow: 2px 2px 10px #202020;
   width: 50%;
   margin: 0 auto;
+  text-shadow: 0.04em 0 black, 2px 2px 10px #202020;
 }
 
 #author {
@@ -46,6 +45,7 @@ div.top {
   text-align: center;
   font-size: 5rem;
   margin: 5px;
+  text-shadow: 2px 2px 20px #2a2a2a;
 }
 
 .center {
