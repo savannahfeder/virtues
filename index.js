@@ -5,7 +5,7 @@
 // - refactor from fetch to use async await
 // - button to generate new quote and image (small 🔁 button in corner?)
 // - cache quotes or have a json file with all quotes downloaded
-// - ability to choose which stoic author
+// - ability to choose which stoic author!
 //    -> saves the author in local storage
 
 let quotesLeftInStorage = JSON.parse(localStorage.getItem('savedQuotes'));
