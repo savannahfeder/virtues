@@ -1,5 +1,5 @@
 // NEXT STEPS
-// - cache quotes and images to reduce load time (see how other apps do it)
+// - Continue: cache quotes and images to reduce load time (see how other apps do it)
 // - publish to chrome web store!
 // --------
 // - refactor from fetch to use async await
@@ -9,6 +9,11 @@
 //    -> saves the author in local storage
 
 // const quotesLeftInStorage = JSON.parse(localStorage.getItem('quotes'));
+
+const renderPage = () => {
+  renderBackground();
+  renderQuote();
+};
 
 // <==================== TIME =======================>
 
@@ -27,25 +32,41 @@ const getCurrentTime = () => {
 
 setInterval(getCurrentTime, 1000);
 
-// <=============== BACKGROUND PHOTO =================>
+// <=============== BACKGROUND IMAGE =================>
 
-fetch(
-  'https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature'
-)
-  .then((res) => res.json())
-  .then((data) => {
-    document.body.style.backgroundImage = `url(${data.urls.regular})`;
-    document.getElementById(
-      'photographer'
-    ).textContent = `Photo by ${data.user.name}`;
-  })
-  .catch((err) => {
+const fetchBackgroundImage = async () => {
+  try {
+    const response = await fetch(
+      'https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature'
+    );
+    return response.json();
+  } catch (err) {
+    // TODO: doesn't catch error; watch back Scrimba video to understand why
     console.log(err);
-    document.body.style.backgroundImage = `url(
-      https://images.unsplash.com/photo-1560008511-11c63416e52d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyMTEwMjl8MHwxfHJhbmRvbXx8fHx8fHx8fDE2MjI4NDIxMTc&ixlib=rb-1.2.1&q=80&w=1080
-    )`;
-    document.getElementById('photographer').textContent = 'By: Dodi Achmad';
-  });
+    const backupImageData = {
+      urls: {
+        full: 'https://images.unsplash.com/photo-1500829243541-74b677fecc30?crop=entropy&cs=tinysrgb&fm=jpg&ixid=MnwxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NTMxMDUyNTA&ixlib=rb-1.2.1&q=80',
+        regular:
+          'https://images.unsplash.com/photo-1500829243541-74b677fecc30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NTMxMDUyNTA&ixlib=rb-1.2.1&q=80&w=1080',
+        small:
+          'https://images.unsplash.com/photo-1500829243541-74b677fecc30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NTMxMDUyNTA&ixlib=rb-1.2.1&q=80&w=400',
+      },
+      user: {
+        name: 'Daniil Silantev',
+      },
+    };
+    return backupImageData;
+  }
+};
+
+const renderBackground = async () => {
+  const data = await fetchBackgroundImage();
+  console.log(data);
+  document.body.style.backgroundImage = `url(${data.urls.regular})`;
+  document.getElementById(
+    'photographer'
+  ).textContent = `Photo by ${data.user.name}`;
+};
 
 // <================== QUOTES ====================>
 
@@ -86,7 +107,7 @@ const fetchQuotes = async () => {
   }
 };
 
-const displayQuote = async () => {
+const renderQuote = async () => {
   const data = await fetchQuotes();
   console.log(data);
   const numQuotes = data.length;
@@ -97,8 +118,6 @@ const displayQuote = async () => {
   document.getElementById('quote').textContent = `"${currentQuoteData.body}"`;
   document.getElementById('author').textContent = currentQuoteData.author;
 };
-
-displayQuote();
 
 const saveNQuotesToLocalStorage = async (n) => {
   // TODO: fetch quotes and save them below
@@ -122,3 +141,5 @@ const retreiveQuoteFromLocalStorage = () => {
 // if (quotesLeftInStorage.length <= 1) {
 //   saveNQuotesToLocalStorage(10);
 // }
+
+renderPage();
