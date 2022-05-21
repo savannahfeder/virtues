@@ -1,5 +1,5 @@
 // NEXT STEPS
-// - Continue: cache quotes and images to reduce load time (see how other apps do it)
+// - cache images (first, copy and paste smilar quotes functions, then make them abstract)
 // - publish to chrome web store!
 // --------
 // - refactor from fetch to use async await
@@ -8,7 +8,10 @@
 // - ability to choose which stoic author
 //    -> saves the author in local storage
 
-// const quotesLeftInStorage = JSON.parse(localStorage.getItem('quotes'));
+let quotesLeftInStorage = JSON.parse(localStorage.getItem('savedQuotes'));
+let numQuotesLeftInStorage = quotesLeftInStorage
+  ? quotesLeftInStorage.length
+  : 0;
 
 const renderPage = () => {
   renderBackground();
@@ -29,8 +32,6 @@ const getCurrentTime = () => {
     { timeStyle: 'short' }
   );
 };
-
-setInterval(getCurrentTime, 1000);
 
 // <=============== BACKGROUND IMAGE =================>
 
@@ -61,7 +62,6 @@ const fetchBackgroundImage = async () => {
 
 const renderBackground = async () => {
   const data = await fetchBackgroundImage();
-  console.log(data);
   document.body.style.backgroundImage = `url(${data.urls.regular})`;
   document.getElementById(
     'photographer'
@@ -89,6 +89,15 @@ const getRandomIndex = (arrayLength) => {
   return Math.round(Math.random() * (arrayLength - 1));
 };
 
+const getRandomQuote = (quotes) => {
+  const numQuotes = quotes.length;
+  let randomQuote = quotes[getRandomIndex(numQuotes)];
+  while (checkIfQuoteTooLong(randomQuote)) {
+    randomQuote = quotes[getRandomIndex(numQuotes)];
+  }
+  return randomQuote;
+};
+
 const checkIfQuoteTooLong = (quote) => {
   const maxQuoteChars = 155;
   const quoteLength = quote.body.length;
@@ -108,38 +117,40 @@ const fetchQuotes = async () => {
 };
 
 const renderQuote = async () => {
-  const data = await fetchQuotes();
-  console.log(data);
-  const numQuotes = data.length;
-  let currentQuoteData = data[getRandomIndex(numQuotes)];
-  while (checkIfQuoteTooLong(currentQuoteData)) {
-    currentQuoteData = data[getRandomIndex(numQuotes)];
-  }
-  document.getElementById('quote').textContent = `"${currentQuoteData.body}"`;
-  document.getElementById('author').textContent = currentQuoteData.author;
+  const currentQuote = retreiveQuoteFromLocalStorage();
+  document.getElementById('quote').textContent = `"${currentQuote.body}"`;
+  document.getElementById('author').textContent = currentQuote.author;
 };
 
 const saveNQuotesToLocalStorage = async (n) => {
-  // TODO: fetch quotes and save them below
-  const quotessss = await fetchQuotes();
-  const quotes = ['quote', 'quote2', 'quote3'];
+  const quotes = await fetchQuotes();
   const quotesToStore = [];
-  const numQuotes = quotes.length;
   for (let i = 0; i < n; i++) {
-    const randomIndex = getRandomIndex(numQuotes);
-    const randomQuote = quotes[randomIndex];
-    quotes.push(randomQuote);
+    const randomQuote = getRandomQuote(quotes);
+    quotesToStore.push(randomQuote);
   }
   localStorage.setItem('savedQuotes', JSON.stringify(quotesToStore));
+  console.log(`Saved ${n} quotes to local storage!`);
 };
 
 const retreiveQuoteFromLocalStorage = () => {
-  // replace array in local storage with one w/o just-retreived quote
-  // update quotesLeftInStorage length
+  const retreivedQuotes = JSON.parse(localStorage.getItem('savedQuotes'));
+  if (retreivedQuotes) {
+    const retreivedQuote = retreivedQuotes.pop();
+    quotesLeftInStorage = retreivedQuotes.length;
+    localStorage.setItem('savedQuotes', JSON.stringify(retreivedQuotes));
+    return retreivedQuote;
+  } else {
+    return backupQuotes[0];
+  }
 };
 
-// if (quotesLeftInStorage.length <= 1) {
-//   saveNQuotesToLocalStorage(10);
-// }
+// <================== RUN APPLICATION ==================>
+
+setInterval(getCurrentTime, 1000);
+
+if (numQuotesLeftInStorage <= 1) {
+  saveNQuotesToLocalStorage(10);
+}
 
 renderPage();
