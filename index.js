@@ -1,22 +1,14 @@
 // NEXT STEPS
+// - change font for quote to improve readability & feel
+// - make content appear 50% down the page (check Stackoverflow)
 // - cache images (first, copy and paste smilar quotes functions, then make them abstract)
 // - publish to chrome web store!
 // --------
 // - refactor from fetch to use async await
 // - button to generate new quote and image (small 🔁 button in corner?)
 // - cache quotes or have a json file with all quotes downloaded
-// - ability to choose which stoic author!
+// - ability to choose which stoic author
 //    -> saves the author in local storage
-
-let quotesLeftInStorage = JSON.parse(localStorage.getItem('savedQuotes'));
-let numQuotesLeftInStorage = quotesLeftInStorage
-  ? quotesLeftInStorage.length
-  : 0;
-
-const renderPage = () => {
-  renderBackground();
-  renderQuote();
-};
 
 // <==================== TIME =======================>
 
@@ -148,6 +140,17 @@ const retreiveQuoteFromLocalStorage = () => {
 // <================== RUN APPLICATION ==================>
 
 setInterval(getCurrentTime, 1000);
+
+let quotesLeftInStorage = JSON.parse(localStorage.getItem('savedQuotes'));
+let numQuotesLeftInStorage = quotesLeftInStorage
+  ? quotesLeftInStorage.length
+  : 0;
+
+const renderPage = () => {
+  renderBackground();
+  renderQuote();
+  // TODO: renderTime()
+};
 
 if (numQuotesLeftInStorage <= 1) {
   saveNQuotesToLocalStorage(10);
