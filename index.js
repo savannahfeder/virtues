@@ -1,4 +1,8 @@
 // NEXT STEPS
+// - fix bug: saveNImagesToLocalStorage is trying to save promises to local storage. Solutions:
+//            - store preset # of URLs in (spend ~20 mins finding pics and save urls into a static folder)
+//                  - Problem: app isn't very robust. Save the images instead in a folder?
+// - find unsplash API that retuns *multiple* images
 // - change font for quote to improve readability & feel
 // - make content appear 50% down the page (check Stackoverflow)
 // - cache images (first, copy and paste smilar quotes functions, then make them abstract)
@@ -27,37 +31,72 @@ const getCurrentTime = () => {
 
 // <=============== BACKGROUND IMAGE =================>
 
-const fetchBackgroundImage = async () => {
+const backupImages = [
+  {
+    urls: {
+      full: 'https://images.unsplash.com/photo-1500829243541-74b677fecc30?crop=entropy&cs=tinysrgb&fm=jpg&ixid=MnwxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NTMxMDUyNTA&ixlib=rb-1.2.1&q=80',
+      regular:
+        'https://images.unsplash.com/photo-1500829243541-74b677fecc30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NTMxMDUyNTA&ixlib=rb-1.2.1&q=80&w=1080',
+      small:
+        'https://images.unsplash.com/photo-1500829243541-74b677fecc30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NTMxMDUyNTA&ixlib=rb-1.2.1&q=80&w=400',
+    },
+    user: {
+      name: 'Daniil Silantev',
+    },
+  },
+];
+
+const fetchImage = async () => {
+  console.log('Fetching image...');
   try {
     const response = await fetch(
       'https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature'
     );
     return response.json();
   } catch (err) {
-    // TODO: doesn't catch error; watch back Scrimba video to understand why
+    console.log('Failing to fetch image...');
     console.log(err);
-    const backupImageData = {
-      urls: {
-        full: 'https://images.unsplash.com/photo-1500829243541-74b677fecc30?crop=entropy&cs=tinysrgb&fm=jpg&ixid=MnwxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NTMxMDUyNTA&ixlib=rb-1.2.1&q=80',
-        regular:
-          'https://images.unsplash.com/photo-1500829243541-74b677fecc30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NTMxMDUyNTA&ixlib=rb-1.2.1&q=80&w=1080',
-        small:
-          'https://images.unsplash.com/photo-1500829243541-74b677fecc30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NTMxMDUyNTA&ixlib=rb-1.2.1&q=80&w=400',
-      },
-      user: {
-        name: 'Daniil Silantev',
-      },
-    };
-    return backupImageData;
+    return backupImages[0];
   }
 };
 
-const renderBackground = async () => {
-  const data = await fetchBackgroundImage();
-  document.body.style.backgroundImage = `url(${data.urls.regular})`;
+const renderBackground = () => {
+  console.log('[1] Rendering background...');
+  const currentImage = retreiveImageFromLocalStorage();
+  console.log('Current image below...');
+  console.log(currentImage);
+  console.log('[3/4] Now rendering background');
+  document.body.style.backgroundImage = `url(${currentImage.urls.regular})`;
   document.getElementById(
     'photographer'
-  ).textContent = `Photo by ${data.user.name}`;
+  ).textContent = `Photo by ${currentImage.user.name}`;
+};
+
+// Copied below (later, refactor to abstract functions)...
+
+const saveNImagesToLocalStorage = async (n) => {
+  console.log('[3] If no images in storage...');
+  const images = [];
+  for (let i = 0; i < n; i++) {
+    const image = await fetchImage();
+    images.push(image);
+  }
+  localStorage.setItem('savedImages', JSON.stringify(images));
+  console.log(`Saved ${n} images to local storage!`);
+};
+
+const retreiveImageFromLocalStorage = () => {
+  console.log('[2] Retreiving images from storage...');
+  const retreivedImages = JSON.parse(localStorage.getItem('savedImages'));
+  if (retreivedImages) {
+    const retreivedImage = retreivedImages.pop();
+    imagesLeftInStorage = retreivedImages.length;
+    localStorage.setItem('savedImages', JSON.stringify(retreivedImages));
+    return retreivedImage;
+  } else {
+    saveNImagesToLocalStorage(2);
+    return backupImages[0];
+  }
 };
 
 // <================== QUOTES ====================>
@@ -146,6 +185,11 @@ let numQuotesLeftInStorage = quotesLeftInStorage
   ? quotesLeftInStorage.length
   : 0;
 
+let imagesLeftInStorage = JSON.parse(localStorage.getItem('savedImages'));
+let numImagesLeftInStorage = imagesLeftInStorage
+  ? imagesLeftInStorage.length
+  : 0;
+
 const renderPage = () => {
   renderBackground();
   renderQuote();
@@ -154,6 +198,10 @@ const renderPage = () => {
 
 if (numQuotesLeftInStorage <= 1) {
   saveNQuotesToLocalStorage(10);
+}
+
+if (numImagesLeftInStorage <= 1) {
+  saveNImagesToLocalStorage(5);
 }
 
 renderPage();
