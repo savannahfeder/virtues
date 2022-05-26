@@ -1,16 +1,13 @@
 // NEXT STEPS
-// - fix bug: saveNImagesToLocalStorage is trying to save promises to local storage. Solutions:
-//            - store preset # of URLs in (spend ~20 mins finding pics and save urls into a static folder)
-//                  - Problem: app isn't very robust. Save the images instead in a folder?
+// - fix bug: after a certain number of reloads, the page... (see bug)
 // - find unsplash API that retuns *multiple* images
-// - change font for quote to improve readability & feel
 // - make content appear 50% down the page (check Stackoverflow)
-// - cache images (first, copy and paste smilar quotes functions, then make them abstract)
 // - publish to chrome web store!
 // --------
 // - refactor from fetch to use async await
 // - button to generate new quote and image (small 🔁 button in corner?)
 // - cache quotes or have a json file with all quotes downloaded
+// - change font for quote to improve readability & feel
 // - ability to choose which stoic author
 //    -> saves the author in local storage
 
@@ -94,7 +91,6 @@ const retreiveImageFromLocalStorage = () => {
     localStorage.setItem('savedImages', JSON.stringify(retreivedImages));
     return retreivedImage;
   } else {
-    saveNImagesToLocalStorage(2);
     return backupImages[0];
   }
 };
@@ -201,7 +197,7 @@ if (numQuotesLeftInStorage <= 1) {
 }
 
 if (numImagesLeftInStorage <= 1) {
-  saveNImagesToLocalStorage(5);
+  saveNImagesToLocalStorage(2);
 }
 
 renderPage();
