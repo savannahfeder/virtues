@@ -1,24 +1,25 @@
 // NEXT STEPS
+// - make it only load once per day
 // - fix bug: after a certain number of reloads, the page... (see bug)
 // - find unsplash API that retuns *multiple* images
 // - make content appear 50% down the page (check Stackoverflow)
 // - publish to chrome web store!
 // --------
-// - refactor from fetch to use async await
 // - button to generate new quote and image (small 🔁 button in corner?)
 // - cache quotes or have a json file with all quotes downloaded
 // - change font for quote to improve readability & feel
 // - ability to choose which stoic author
 //    -> saves the author in local storage
 
+const renderPage = () => {
+  renderBackground();
+  renderQuote();
+  renderTime();
+};
+
 // <==================== TIME =======================>
 
-const date = new Date();
-document.getElementById('time').textContent = date.toLocaleTimeString('en-us', {
-  timeStyle: 'short',
-});
-
-const getCurrentTime = () => {
+const renderTime = () => {
   const todaysDate = new Date();
   document.getElementById('time').textContent = todaysDate.toLocaleTimeString(
     'en-us',
@@ -44,51 +45,41 @@ const backupImages = [
 ];
 
 const fetchImage = async () => {
-  console.log('Fetching image...');
   try {
     const response = await fetch(
       'https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature'
     );
     return response.json();
   } catch (err) {
-    console.log('Failing to fetch image...');
     console.log(err);
     return backupImages[0];
   }
 };
 
 const renderBackground = () => {
-  console.log('[1] Rendering background...');
   const currentImage = retreiveImageFromLocalStorage();
-  console.log('Current image below...');
-  console.log(currentImage);
-  console.log('[3/4] Now rendering background');
   document.body.style.backgroundImage = `url(${currentImage.urls.regular})`;
   document.getElementById(
     'photographer'
   ).textContent = `Photo by ${currentImage.user.name}`;
 };
 
-// Copied below (later, refactor to abstract functions)...
-
 const saveNImagesToLocalStorage = async (n) => {
-  console.log('[3] If no images in storage...');
   const images = [];
   for (let i = 0; i < n; i++) {
     const image = await fetchImage();
     images.push(image);
   }
-  localStorage.setItem('savedImages', JSON.stringify(images));
+  saveToLocalStorage('savedImages', images);
   console.log(`Saved ${n} images to local storage!`);
 };
 
 const retreiveImageFromLocalStorage = () => {
-  console.log('[2] Retreiving images from storage...');
-  const retreivedImages = JSON.parse(localStorage.getItem('savedImages'));
+  const retreivedImages = retrieveFromLocalStorage('savedImages');
   if (retreivedImages) {
     const retreivedImage = retreivedImages.pop();
-    imagesLeftInStorage = retreivedImages.length;
-    localStorage.setItem('savedImages', JSON.stringify(retreivedImages));
+    numImagesLeftInStorage = retreivedImages.length;
+    saveToLocalStorage('savedImages', retreivedImages);
     return retreivedImage;
   } else {
     return backupImages[0];
@@ -156,41 +147,50 @@ const saveNQuotesToLocalStorage = async (n) => {
     const randomQuote = getRandomQuote(quotes);
     quotesToStore.push(randomQuote);
   }
+  saveToLocalStorage('savedQuotes', quotesToStore);
   localStorage.setItem('savedQuotes', JSON.stringify(quotesToStore));
   console.log(`Saved ${n} quotes to local storage!`);
 };
 
 const retreiveQuoteFromLocalStorage = () => {
-  const retreivedQuotes = JSON.parse(localStorage.getItem('savedQuotes'));
+  const retreivedQuotes = retrieveFromLocalStorage('savedQuotes');
   if (retreivedQuotes) {
     const retreivedQuote = retreivedQuotes.pop();
-    quotesLeftInStorage = retreivedQuotes.length;
-    localStorage.setItem('savedQuotes', JSON.stringify(retreivedQuotes));
+    numQuotesLeftInStorage = retreivedQuotes.length;
+    saveToLocalStorage('savedQuotes', retreivedQuotes);
     return retreivedQuote;
   } else {
     return backupQuotes[0];
   }
 };
 
+const retrieveFromLocalStorage = (key) => {
+  return JSON.parse(localStorage.getItem(key));
+};
+
+const saveToLocalStorage = (key, value) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
+
+// <===================== REFRESH =====================>
+document.getElementById('refresh').addEventListener('click', () => {
+  renderPage();
+});
+
 // <================== RUN APPLICATION ==================>
 
-setInterval(getCurrentTime, 1000);
+renderTime();
+setInterval(renderTime, 1000);
 
-let quotesLeftInStorage = JSON.parse(localStorage.getItem('savedQuotes'));
+let quotesLeftInStorage = retrieveFromLocalStorage('savedQuotes');
 let numQuotesLeftInStorage = quotesLeftInStorage
   ? quotesLeftInStorage.length
   : 0;
 
-let imagesLeftInStorage = JSON.parse(localStorage.getItem('savedImages'));
+let imagesLeftInStorage = retrieveFromLocalStorage('savedImages');
 let numImagesLeftInStorage = imagesLeftInStorage
   ? imagesLeftInStorage.length
   : 0;
-
-const renderPage = () => {
-  renderBackground();
-  renderQuote();
-  // TODO: renderTime()
-};
 
 if (numQuotesLeftInStorage <= 1) {
   saveNQuotesToLocalStorage(10);
