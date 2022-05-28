@@ -11,12 +11,6 @@
 // - ability to choose which stoic author
 //    -> saves the author in local storage
 
-const renderPage = () => {
-  renderBackground();
-  renderQuote();
-  renderTime();
-};
-
 // <==================== TIME =======================>
 
 const renderTime = () => {
@@ -179,6 +173,27 @@ document.getElementById('refresh').addEventListener('click', () => {
 
 // <================== RUN APPLICATION ==================>
 
+const saveDate = () => {
+  const todaysDate = new Date();
+  // !!! change to toLocalDateString (to only get date, not time)
+  saveToLocalStorage('lastSavedDate', todaysDate);
+};
+
+const isNewDay = () => {
+  const previousDate = localStorage.getItem('lastSavedDate');
+  const todaysDate = new Date();
+  // !!! change to toLocalDateString (to only get date, not time)
+  return previousDate !== todaysDate;
+};
+
+// !!! make retreive from todaysQuote and todaysImage
+const renderPage = () => {
+  renderBackground();
+  renderQuote();
+  renderTime();
+  saveDate();
+};
+
 renderTime();
 setInterval(renderTime, 1000);
 
@@ -200,4 +215,7 @@ if (numImagesLeftInStorage <= 1) {
   saveNImagesToLocalStorage(2);
 }
 
-renderPage();
+if (isNewDay()) {
+  //saveNewDateAndImage()
+  renderPage();
+}
