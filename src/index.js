@@ -1,5 +1,5 @@
 // NEXT STEPS
-// - make it only load once per day
+// - refactor render functions so that they retreive the image from todaysImage or todaysQuote
 // - fix bug: after a certain number of reloads, the page... (see bug)
 // - find unsplash API that retuns *multiple* images
 // - make content appear 50% down the page (check Stackoverflow)
@@ -142,7 +142,6 @@ const saveNQuotesToLocalStorage = async (n) => {
     quotesToStore.push(randomQuote);
   }
   saveToLocalStorage('savedQuotes', quotesToStore);
-  localStorage.setItem('savedQuotes', JSON.stringify(quotesToStore));
   console.log(`Saved ${n} quotes to local storage!`);
 };
 
@@ -174,15 +173,14 @@ document.getElementById('refresh').addEventListener('click', () => {
 // <================== RUN APPLICATION ==================>
 
 const saveDate = () => {
-  const todaysDate = new Date();
-  // !!! change to toLocalDateString (to only get date, not time)
+  const todaysDate = new Date().toDateString();
   saveToLocalStorage('lastSavedDate', todaysDate);
 };
 
 const isNewDay = () => {
-  const previousDate = localStorage.getItem('lastSavedDate');
-  const todaysDate = new Date();
-  // !!! change to toLocalDateString (to only get date, not time)
+  const previousDate = retrieveFromLocalStorage('lastSavedDate');
+  const todaysDate = new Date().toDateString();
+  console.log(todaysDate);
   return previousDate !== todaysDate;
 };
 
@@ -215,7 +213,23 @@ if (numImagesLeftInStorage <= 1) {
   saveNImagesToLocalStorage(2);
 }
 
+const saveTodaysQuote = () => {
+  const retreivedQuotes = retrieveFromLocalStorage('savedQuotes');
+  const todaysQuote = retreivedQuotes.pop();
+  saveToLocalStorage('todaysQuote', todaysQuote);
+  saveToLocalStorage('savedQuotes', retreivedQuotes);
+};
+
+const saveTodaysImage = () => {
+  const retreivedImages = retrieveFromLocalStorage('savedImages');
+  const todaysImage = retreivedImages.pop();
+  saveToLocalStorage('todaysImage', todaysImage);
+  saveToLocalStorage('savedImages', retreivedImages);
+};
+
 if (isNewDay()) {
-  //saveNewDateAndImage()
+  saveTodaysQuote();
+  saveTodaysImage();
+  saveDate();
   renderPage();
 }
