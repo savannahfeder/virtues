@@ -82,12 +82,19 @@ p.weather-city {
 }
 
 #refresh {
-  font-size: 2.5rem;
+  font-size: 1.8rem;
+  color: white;
   position: fixed;
   bottom: 20;
-  left: 25;
-  padding: 0;
-  border: none;
+  left: 20;
+  border-radius: 100px;
   cursor: pointer;
+  padding: 0 0.6rem 0.2rem 0.5rem;
   background-color: transparent;
+  border: white solid 1px;
+}
+
+#refresh:hover {
+  background-color: white;
+  color: black;
 }
