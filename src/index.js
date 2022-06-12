@@ -1,14 +1,3 @@
-// NEXT STEPS
-// - find unsplash API that retuns *multiple* images
-// - make content appear 50% down the page (check Stackoverflow)
-// - publish to chrome web store!
-// --------
-// - button to generate new quote and image (small 🔁 button in corner?)
-// - cache quotes or have a json file with all quotes downloaded
-// - change font for quote to improve readability & feel
-// - ability to choose which stoic author
-//    -> saves the author in local storage
-
 // <==================== TIME =======================>
 
 const renderTime = () => {
@@ -235,7 +224,7 @@ const renderPage = async () => {
   }
 };
 
+// RUN
 renderTime();
 setInterval(renderTime, 1000);
-
 renderPage();
