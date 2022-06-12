@@ -1,6 +1,4 @@
 // NEXT STEPS
-// - refactor render functions so that they retreive the image from todaysImage or todaysQuote
-// - fix bug: after a certain number of reloads, the page... (see bug)
 // - find unsplash API that retuns *multiple* images
 // - make content appear 50% down the page (check Stackoverflow)
 // - publish to chrome web store!
@@ -69,15 +67,21 @@ const saveNImagesToLocalStorage = async (n) => {
 };
 
 const retreiveImageFromLocalStorage = () => {
-  const retreivedImages = retrieveFromLocalStorage('savedImages');
-  if (retreivedImages) {
-    const retreivedImage = retreivedImages.pop();
-    numImagesLeftInStorage = retreivedImages.length;
-    saveToLocalStorage('savedImages', retreivedImages);
+  const retreivedImage = retrieveFromLocalStorage('todaysImage');
+  if (retreivedImage) {
     return retreivedImage;
   } else {
+    console.log('Image was not successfully retreived. Returned backup image.');
     return backupImages[0];
   }
+};
+
+const saveTodaysImage = () => {
+  const retreivedImages = retrieveFromLocalStorage('savedImages');
+  const todaysImage = retreivedImages.pop();
+  numImagesLeftInStorage = retreivedImages.length;
+  saveToLocalStorage('todaysImage', todaysImage);
+  saveToLocalStorage('savedImages', retreivedImages);
 };
 
 // <================== QUOTES ====================>
@@ -146,16 +150,24 @@ const saveNQuotesToLocalStorage = async (n) => {
 };
 
 const retreiveQuoteFromLocalStorage = () => {
-  const retreivedQuotes = retrieveFromLocalStorage('savedQuotes');
-  if (retreivedQuotes) {
-    const retreivedQuote = retreivedQuotes.pop();
-    numQuotesLeftInStorage = retreivedQuotes.length;
-    saveToLocalStorage('savedQuotes', retreivedQuotes);
+  const retreivedQuote = retrieveFromLocalStorage('todaysQuote');
+  if (retreivedQuote) {
     return retreivedQuote;
   } else {
+    console.log('Quote was not successfully retreived. Returned backup quote.');
     return backupQuotes[0];
   }
 };
+
+const saveTodaysQuote = () => {
+  const retreivedQuotes = retrieveFromLocalStorage('savedQuotes');
+  const todaysQuote = retreivedQuotes.pop();
+  numQuotesLeftInStorage = retreivedQuotes.length;
+  saveToLocalStorage('todaysQuote', todaysQuote);
+  saveToLocalStorage('savedQuotes', retreivedQuotes);
+};
+
+// <================== GENERAL FUNCTIONS ==================>
 
 const retrieveFromLocalStorage = (key) => {
   return JSON.parse(localStorage.getItem(key));
@@ -164,13 +176,6 @@ const retrieveFromLocalStorage = (key) => {
 const saveToLocalStorage = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
-
-// <===================== REFRESH =====================>
-document.getElementById('refresh').addEventListener('click', () => {
-  renderPage();
-});
-
-// <================== RUN APPLICATION ==================>
 
 const saveDate = () => {
   const todaysDate = new Date().toDateString();
@@ -183,53 +188,54 @@ const isNewDay = () => {
   console.log(todaysDate);
   return previousDate !== todaysDate;
 };
+const fillStorage = async () => {
+  let quotesLeftInStorage = retrieveFromLocalStorage('savedQuotes');
+  let numQuotesLeftInStorage = quotesLeftInStorage
+    ? quotesLeftInStorage.length
+    : 0;
 
-// !!! make retreive from todaysQuote and todaysImage
-const renderPage = () => {
-  renderBackground();
-  renderQuote();
-  renderTime();
+  let imagesLeftInStorage = retrieveFromLocalStorage('savedImages');
+  let numImagesLeftInStorage = imagesLeftInStorage
+    ? imagesLeftInStorage.length
+    : 0;
+
+  if (numImagesLeftInStorage <= 1) {
+    await saveNImagesToLocalStorage(3);
+  }
+
+  if (numQuotesLeftInStorage <= 1) {
+    await saveNQuotesToLocalStorage(3);
+  }
+};
+
+const refreshData = async () => {
+  await fillStorage();
+  saveTodaysQuote();
+  saveTodaysImage();
   saveDate();
+};
+
+// <===================== REFRESH =====================>
+document.getElementById('refresh').addEventListener('click', () => {
+  refreshData();
+  renderPage();
+});
+
+// <================== RUN APPLICATION ==================>
+
+const renderPage = async () => {
+  await fillStorage();
+  if (isNewDay()) {
+    refreshData();
+    renderPage();
+  } else {
+    renderBackground();
+    renderQuote();
+    renderTime();
+  }
 };
 
 renderTime();
 setInterval(renderTime, 1000);
 
-let quotesLeftInStorage = retrieveFromLocalStorage('savedQuotes');
-let numQuotesLeftInStorage = quotesLeftInStorage
-  ? quotesLeftInStorage.length
-  : 0;
-
-let imagesLeftInStorage = retrieveFromLocalStorage('savedImages');
-let numImagesLeftInStorage = imagesLeftInStorage
-  ? imagesLeftInStorage.length
-  : 0;
-
-if (numQuotesLeftInStorage <= 1) {
-  saveNQuotesToLocalStorage(10);
-}
-
-if (numImagesLeftInStorage <= 1) {
-  saveNImagesToLocalStorage(2);
-}
-
-const saveTodaysQuote = () => {
-  const retreivedQuotes = retrieveFromLocalStorage('savedQuotes');
-  const todaysQuote = retreivedQuotes.pop();
-  saveToLocalStorage('todaysQuote', todaysQuote);
-  saveToLocalStorage('savedQuotes', retreivedQuotes);
-};
-
-const saveTodaysImage = () => {
-  const retreivedImages = retrieveFromLocalStorage('savedImages');
-  const todaysImage = retreivedImages.pop();
-  saveToLocalStorage('todaysImage', todaysImage);
-  saveToLocalStorage('savedImages', retreivedImages);
-};
-
-if (isNewDay()) {
-  saveTodaysQuote();
-  saveTodaysImage();
-  saveDate();
-  renderPage();
-}
+renderPage();
