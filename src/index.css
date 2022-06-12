@@ -74,15 +74,27 @@ p.weather-city {
   font-size: 1.2rem;
 }
 
-p.weather-temp {
-  margin: 0;
-  font-size: 1.7rem;
-  margin-left: -10px;
-}
-
-p#photographer {
+#photographer {
   font-size: 0.8rem;
   position: fixed;
   bottom: 0;
   right: 20;
+}
+
+#refresh {
+  font-size: 1.8rem;
+  color: white;
+  position: fixed;
+  bottom: 20;
+  left: 20;
+  border-radius: 100px;
+  cursor: pointer;
+  padding: 0 0.6rem 0.2rem 0.5rem;
+  background-color: transparent;
+  border: white solid 1px;
+}
+
+#refresh:hover {
+  background-color: white;
+  color: black;
 }
