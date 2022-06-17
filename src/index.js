@@ -1,3 +1,6 @@
+// Before Deployment
+//   - make error handling for white screen or wrong values in storage. ResetApp() function which deletes storage
+
 // <==================== TIME =======================>
 
 const renderTime = () => {
@@ -159,7 +162,13 @@ const saveTodaysQuote = () => {
 // <================== GENERAL FUNCTIONS ==================>
 
 const retrieveFromLocalStorage = (key) => {
-  return JSON.parse(localStorage.getItem(key));
+  const retrievedJSONData = localStorage.getItem(key);
+  if (retrievedJSONData === ('undefined' || 'null')) {
+    return null;
+  } else {
+    const parsedData = JSON.parse(retrievedJSONData);
+    return parsedData;
+  }
 };
 
 const saveToLocalStorage = (key, value) => {
@@ -177,31 +186,34 @@ const isNewDay = () => {
   console.log(todaysDate);
   return previousDate !== todaysDate;
 };
+
 const fillStorage = async () => {
-  let quotesLeftInStorage = retrieveFromLocalStorage('savedQuotes');
-  let numQuotesLeftInStorage = quotesLeftInStorage
-    ? quotesLeftInStorage.length
-    : 0;
-
-  let imagesLeftInStorage = retrieveFromLocalStorage('savedImages');
-  let numImagesLeftInStorage = imagesLeftInStorage
-    ? imagesLeftInStorage.length
-    : 0;
-
   if (numImagesLeftInStorage <= 1) {
     await saveNImagesToLocalStorage(3);
   }
-
   if (numQuotesLeftInStorage <= 1) {
     await saveNQuotesToLocalStorage(3);
+  }
+  if (!isTodaysImageInStorage) {
+    saveTodaysImage();
+  }
+  if (!isTodaysQuoteInStorage) {
+    saveTodaysQuote();
   }
 };
 
 const refreshData = async () => {
   await fillStorage();
-  saveTodaysQuote();
-  saveTodaysImage();
   saveDate();
+};
+
+const isDataInStorage = () => {
+  return (
+    numImagesLeftInStorage &&
+    numQuotesLeftInStorage &&
+    numImagesLeftInStorage &&
+    numQuotesLeftInStorage
+  );
 };
 
 // <===================== REFRESH =====================>
@@ -211,9 +223,27 @@ document.getElementById('refresh').addEventListener('click', () => {
 });
 
 // <================== RUN APPLICATION ==================>
+const countItemsInStorage = (key) => {
+  const items = retrieveFromLocalStorage(key);
+  const numItemsLeftInStorage = items ? items.length : 0;
+  return numItemsLeftInStorage;
+};
+
+let numQuotesLeftInStorage = countItemsInStorage('savedQuotes');
+let numImagesLeftInStorage = countItemsInStorage('savedImages');
+let isTodaysQuoteInStorage = countItemsInStorage('todaysQuote') === 1;
+let isTodaysImageInStorage = countItemsInStorage('todaysImage') === 1;
+console.log(
+  numImagesLeftInStorage,
+  numQuotesLeftInStorage,
+  isTodaysImageInStorage,
+  isTodaysImageInStorage
+);
 
 const renderPage = async () => {
-  await fillStorage();
+  if (!isDataInStorage()) {
+    await fillStorage();
+  }
   if (isNewDay()) {
     refreshData();
     renderPage();
