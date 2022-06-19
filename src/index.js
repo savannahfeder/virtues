@@ -63,8 +63,7 @@ const retreiveImageFromLocalStorage = () => {
   if (retreivedImage) {
     return retreivedImage;
   } else {
-    console.log('Image was not successfully retreived. Returned backup image.');
-    return backupImages[0];
+    throw new Error('Failed to retreive image from local storage.');
   }
 };
 
@@ -241,16 +240,37 @@ console.log(
 );
 
 const renderPage = async () => {
-  if (!isDataInStorage()) {
-    await fillStorage();
+  try {
+    if (!isDataInStorage()) {
+      await fillStorage();
+    }
+    if (isNewDay()) {
+      refreshData();
+      renderPage();
+    } else {
+      renderBackground();
+      renderQuote();
+      renderTime();
+    }
+  } catch (error) {
+    // handleError();
+    resetApp();
   }
-  if (isNewDay()) {
-    refreshData();
-    renderPage();
-  } else {
-    renderBackground();
-    renderQuote();
-    renderTime();
+};
+
+const resetApp = () => {
+  try {
+    // resetting storage values
+  } catch (error) {
+    // handleError()
+  }
+};
+
+const handleError = () => {
+  try {
+    renderDefaultValues();
+  } catch (error) {
+    renderErrorMessage();
   }
 };
 
