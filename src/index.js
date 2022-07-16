@@ -1,5 +1,10 @@
 // Before Deployment
-//   - make error handling for white screen or wrong values in storage. ResetApp() function which deletes storage
+// Thought: maybe don't move forward *until* you've made a database? That way, your server can send pictures instead of urls
+//   - add loading component
+//   - Functions not throwing errors when hit net::ERR_CONNECTION_TIMED_OUT (and possibly other errors)
+//   - Change new tab icon & Virtues icon
+//   - switch Scrimba API with Unsplash
+//   - Apply for production: https://unsplash.com/oauth/applications/331127 - requires link
 
 // <==================== TIME =======================>
 
@@ -34,9 +39,9 @@ const fetchImage = async () => {
       'https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature'
     );
     return response.json();
-  } catch (err) {
-    console.log(err);
-    return backupImages[0];
+  } catch (error) {
+    console.log('Error thrown in fetchImage function!');
+    throw error;
   }
 };
 
@@ -45,7 +50,7 @@ const renderBackground = () => {
   document.body.style.backgroundImage = `url(${currentImage.urls.regular})`;
   document.getElementById(
     'photographer'
-  ).textContent = `Photo by ${currentImage.user.name}`;
+  ).textContent = `Photo by ${currentImage.user.name} on Unsplash`;
 };
 
 const saveNImagesToLocalStorage = async (n) => {
@@ -118,8 +123,8 @@ const fetchQuotes = async () => {
     );
     return await response.json();
   } catch (err) {
-    console.log(err);
-    return backupQuotes;
+    console.log('Error thrown in fetchQuotes function!');
+    throw err;
   }
 };
 
@@ -145,8 +150,7 @@ const retreiveQuoteFromLocalStorage = () => {
   if (retreivedQuote) {
     return retreivedQuote;
   } else {
-    console.log('Quote was not successfully retreived. Returned backup quote.');
-    return backupQuotes[0];
+    throw new Error('Quote was not successfully retreived from local storage.');
   }
 };
 
@@ -187,22 +191,27 @@ const isNewDay = () => {
 };
 
 const fillStorage = async () => {
-  if (numImagesLeftInStorage <= 1) {
-    await saveNImagesToLocalStorage(3);
-  }
-  if (numQuotesLeftInStorage <= 1) {
-    await saveNQuotesToLocalStorage(3);
-  }
-  if (!isTodaysImageInStorage) {
-    saveTodaysImage();
-  }
-  if (!isTodaysQuoteInStorage) {
-    saveTodaysQuote();
+  try {
+    if (numImagesLeftInStorage <= 1) {
+      saveNImagesToLocalStorage(3);
+    }
+    if (numQuotesLeftInStorage <= 1) {
+      saveNQuotesToLocalStorage(3);
+    }
+    if (!isTodaysImageInStorage) {
+      saveTodaysImage();
+    }
+    if (!isTodaysQuoteInStorage) {
+      saveTodaysQuote();
+    }
+  } catch (err) {
+    console.log('Error thrown in fillStorage function!');
+    throw err;
   }
 };
 
 const refreshData = async () => {
-  await fillStorage();
+  fillStorage();
   saveDate();
 };
 
@@ -215,10 +224,20 @@ const isDataInStorage = () => {
   );
 };
 
+const renderApp = () => {
+  renderBackground();
+  renderQuote();
+  renderTime();
+};
+
 // <===================== REFRESH =====================>
 document.getElementById('refresh').addEventListener('click', () => {
   refreshData();
-  renderPage();
+  try {
+    renderApp();
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 // <================== RUN APPLICATION ==================>
@@ -232,38 +251,46 @@ let numQuotesLeftInStorage = countItemsInStorage('savedQuotes');
 let numImagesLeftInStorage = countItemsInStorage('savedImages');
 let isTodaysQuoteInStorage = countItemsInStorage('todaysQuote') === 1;
 let isTodaysImageInStorage = countItemsInStorage('todaysImage') === 1;
-console.log(
-  numImagesLeftInStorage,
-  numQuotesLeftInStorage,
-  isTodaysImageInStorage,
-  isTodaysImageInStorage
-);
 
-const renderPage = async () => {
+const runAppAndCatchErrors = async () => {
+  console.log('Running application!');
+  try {
+    await runApp();
+  } catch (error) {
+    resetApp();
+  }
+};
+
+const resetApp = async () => {
+  console.log('Resetting app!');
+  try {
+    emptyStorage();
+    await fillStorage();
+    runApp(); //!!! problem: because runApp catches the error, if it hits an error, it'll call itself recursively
+  } catch (error) {
+    // handleError()
+  }
+};
+
+const runApp = async () => {
   try {
     if (!isDataInStorage()) {
       await fillStorage();
     }
     if (isNewDay()) {
       refreshData();
-      renderPage();
+      runApp();
     } else {
-      renderBackground();
-      renderQuote();
-      renderTime();
+      renderApp();
     }
   } catch (error) {
-    // handleError();
-    resetApp();
+    console.log('Error thrown in runApp function!');
+    throw error;
   }
 };
 
-const resetApp = () => {
-  try {
-    // resetting storage values
-  } catch (error) {
-    // handleError()
-  }
+const emptyStorage = () => {
+  localStorage.clear();
 };
 
 const handleError = () => {
@@ -277,4 +304,4 @@ const handleError = () => {
 // RUN
 renderTime();
 setInterval(renderTime, 1000);
-renderPage();
+runAppAndCatchErrors();
